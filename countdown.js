@@ -18,40 +18,85 @@ const countdown = function(_config) {
   let count_min = 0;
 
   // check if it is Leap Year
-  const isLeapYear = false;
-  if (yearNow % 4 == 0) {
-    if (yearNow % 100 == 0) {
-      if (yearNow % 400 == 0) {
-        isLeapYear = true;
-      }
-    } else {    
-      isLeapYear = true;
-    }
-  }
-
+  let isLeapYear = false;
+  isLeapYear = checkLeapYear(yearNow);
   if (isLeapYear) {
     months[1] = 29;
   }
-
-  if (monthNow == month) {
+  
+  if (monthNow == month && yearNow == year) {
     count_day = day - dayNow;
-  } else {
+  } else {  
+    let yearDiff = year - yearNow;
+    for (let y = yearNow; y < year; y++) {
+      if (checkLeapYear(y)) {
+        count_day += 366;
+      } else {
+        count_day += 365;
+      }
+    }
     let monthDiff = month - monthNow;
     let numOfDaysThisMonth = months[monthNow-1];
-    count_day += numOfDaysThisMonth - dayNow;
-
-    for (let x = monthNow + 1; x <= month; x++) {
-      if (x == month) {      
-        count_day += day;
-      } else {
-        count_day += months[x-1];
+    let smallerMonth = monthNow;
+    let largerMonth = month;
+    if (monthNow > month) {
+      smallerMonth = month;
+      largerMonth = monthNow;
+    }
+    
+    for (let x = smallerMonth; x <= largerMonth; x++) {
+      if (yearNow == year) {
+        if (x == monthNow) {  
+          count_day += numOfDaysThisMonth - dayNow; 
+        } else if (x == month) {      
+          count_day += day;
+        } else {
+          count_day += months[x-1];
+        }
+      } else if (year > yearNow) { // year > yearNow
+        if (monthNow < month) {
+          if (x == largerMonth) {            
+            count_day += day;
+          } else {
+            count_day += months[x-1];
+            if (x == monthNow) {
+              count_day -= dayNow;
+            }
+          }
+        } else if (monthNow == month) {
+          if (x == largerMonth) {  
+            count_day += day - dayNow;
+          }
+        } else { // month < monthNow
+          if (x == largerMonth) {                        
+            if (x == largerMonth) {  
+              count_day += day - dayNow;
+            }
+          } else {            
+            count_day -= months[x-1];
+          }
+        }
       }
+      
     }
 
   }
   
   update();
   setInterval(update, 30000);
+  
+  function checkLeapYear(_year) {    
+    if (_year % 4 == 0) {
+      if (_year % 100 == 0) {
+        if (_year % 400 == 0) {
+          return true;
+        }
+      } else {    
+        return true;
+      }
+    }
+    return false;
+  }
   
   function update() {
     dateNow = new Date();    
@@ -61,12 +106,11 @@ const countdown = function(_config) {
     count_hour = 23 - hourNow;
     count_min = 60 - minNow;
     
-    if (count_day >= 0) {
-    } else {
-      count_day = 0;
+    if (yearNow > year || (monthNow >= month && dayNow >= day)) {
       count_hour = 0;
       count_min = 0;
     }
+    
     $(_config.target+' .day').innerHTML = addZero(count_day) + _config.dayWord;
     $(_config.target+' .hour').innerHTML = addZero(count_hour) + _config.hourWord;
     $(_config.target+' .min').innerHTML = addZero(count_min) + _config.minWord; 
