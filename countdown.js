@@ -5,7 +5,16 @@ const countdown = function(_config) {
   const day = parseInt(tarDate[0]);
   const month = parseInt(tarDate[1]);
   const year = parseInt(tarDate[2]);
+  let tarTime = $(_config.target).getAttribute('data-time');
+  let tarhour, tarmin;
+  
+  if (tarTime != null) {    
+    tarTime = tarTime.split(':');
+    tarhour = parseInt(tarTime[0]);
+    tarmin = parseInt(tarTime[1]);
+  }
 
+  console.log(tarhour)
   let months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   let dateNow = new Date();
   let dayNow = dateNow.getDate();
@@ -101,10 +110,23 @@ const countdown = function(_config) {
   function update() {
     dateNow = new Date();    
     hourNow = dateNow.getHours();
-    minNow = dateNow.getMinutes();
+    minNow = dateNow.getMinutes();    
 
-    count_hour = 23 - hourNow;
-    count_min = 60 - minNow;
+    if (tarTime == null) {
+      count_hour = 23 - hourNow;
+      count_min = 60 - minNow;    
+    } else {      
+      count_hour = tarhour - hourNow;
+      count_min = tarmin - minNow; 
+      if (tarmin < minNow) {
+        count_hour -= 1;
+        count_min += 60;
+      }
+      if (tarhour < hourNow || count_hour < 0) {
+        count_day -= 1;
+        count_hour += 24;
+      }
+    }
     
     if (yearNow > year || (monthNow >= month && dayNow >= day)) {
       count_hour = 0;
