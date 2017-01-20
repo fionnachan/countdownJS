@@ -11,6 +11,14 @@ Pure Javascript Countdown - supports IE9+
   .hour
   .min
 ```
+Default end time is 23:59 of the date.
+```
+.whatever-name with data-date="dd-mm-yyyy" and data-time="hh:mm"
+  .day
+  .hour
+  .min
+```
+End time is set to hour:minute (24-hour format) of the date.
 
 ###JS initializer:
 
