@@ -14,7 +14,6 @@ const countdown = function(_config) {
     tarmin = parseInt(tarTime[1]);
   }
 
-  console.log(tarhour)
   let months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   let dateNow = new Date();
   let dayNow = dateNow.getDate();
@@ -25,6 +24,7 @@ const countdown = function(_config) {
   let count_day = 0;
   let count_hour = 0;
   let count_min = 0;
+  let count_day_isSet = false;
 
   // check if it is Leap Year
   let isLeapYear = false;
@@ -123,7 +123,10 @@ const countdown = function(_config) {
         count_min += 60;
       }
       if (tarhour < hourNow || count_hour < 0) {
-        count_day -= 1;
+        if (count_day_isSet == false) {
+          count_day -= 1;
+          count_day_isSet = true;
+        }
         count_hour += 24;
       }
     }
