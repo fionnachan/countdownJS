@@ -25,127 +25,49 @@ const countdown = function(_config) {
   let count_hour = 0;
   let count_min = 0;
   let count_day_isSet = false;
-
-  // check if it is Leap Year
-  let isLeapYear = false;
-  isLeapYear = checkLeapYear(yearNow);
-  if (isLeapYear) {
-    months[1] = 29;
-  }
+  let isOver = false;
   
-  if (monthNow == month && yearNow == year) {
-    count_day = day - dayNow;
-  } else {  
-    let yearDiff = year - yearNow;
-    for (let y = yearNow; y < year; y++) {
-      if (checkLeapYear(y)) {
-        count_day += 366;
-      } else {
-        count_day += 365;
-      }
-    }
-    let monthDiff = month - monthNow;
-    let numOfDaysThisMonth = months[monthNow-1];
-    let smallerMonth = monthNow;
-    let largerMonth = month;
-    if (monthNow > month) {
-      smallerMonth = month;
-      largerMonth = monthNow;
-    }
-    
-    for (let x = smallerMonth; x <= largerMonth; x++) {
-      if (yearNow == year) {
-        if (x == monthNow) {  
-          count_day += numOfDaysThisMonth - dayNow; 
-        } else if (x == month) {      
-          count_day += day;
-        } else {
-          count_day += months[x-1];
-        }
-      } else if (year > yearNow) { // year > yearNow
-        if (monthNow < month) {
-          if (x == largerMonth) {            
-            count_day += day;
-          } else {
-            count_day += months[x-1];
-            if (x == monthNow) {
-              count_day -= dayNow;
-            }
-          }
-        } else if (monthNow == month) {
-          if (x == largerMonth) {  
-            count_day += day - dayNow;
-          }
-        } else { // month < monthNow
-          if (x == largerMonth) {                        
-            if (x == largerMonth) {  
-              count_day += day - dayNow;
-            }
-          } else {            
-            count_day -= months[x-1];
-          }
-        }
-      }
-      
-    }
+  // Set the date we're counting down to
+  var countDownDate = new Date(year, month-1, day, tarhour, tarmin, 0, 0).getTime();
 
-  }
-  
-  update();
-  setInterval(update, 30000);
-  
-  function checkLeapYear(_year) {    
-    if (_year % 4 == 0) {
-      if (_year % 100 == 0) {
-        if (_year % 400 == 0) {
-          return true;
-        }
-      } else {    
-        return true;
-      }
-    }
-    return false;
-  }
-  
-  function update() {
-    dateNow = new Date();    
-    hourNow = dateNow.getHours();
-    minNow = dateNow.getMinutes();    
+  // Update the count down every 1 second
+  var x = setInterval(function() {
 
-    if (tarTime == null) {
-      count_hour = 23 - hourNow;
-      count_min = 60 - minNow;    
-    } else {      
-      count_hour = tarhour - hourNow;
-      count_min = tarmin - minNow; 
-      if (tarmin < minNow) {
-        count_hour -= 1;
-        count_min += 60;
-      }
-      if (tarhour < hourNow || count_hour < 0) {
-        if (count_day_isSet == false) {
-          count_day -= 1;
-          count_day_isSet = true;
-        }
-        count_hour += 24;
-      }
-    }
-    
-    if (yearNow > year || (monthNow >= month && dayNow >= day)) {
-      count_hour = 0;
-      count_min = 0;
-    }
-    
-    $(_config.target+' .day').innerHTML = addZero(count_day) + _config.dayWord;
-    $(_config.target+' .hour').innerHTML = addZero(count_hour) + _config.hourWord;
-    $(_config.target+' .min').innerHTML = addZero(count_min) + _config.minWord; 
-  }
+      // Get todays date and time
+      var now = new Date().getTime();
 
-  function addZero(x) {
-    if (x < 10 && x >= 0) {
-      return "0"+x;
-    } else {
-      return x;
-    }
+      // Find the distance between now an the count down date
+      var distance = countDownDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      $(_config.target+' .day .num').innerHTML = addZero(days);
+      $(_config.target+' .hour .num').innerHTML = addZero(hours);
+      $(_config.target+' .min .num').innerHTML = addZero(minutes);
+      $(_config.target+' .sec .num').innerHTML = addZero(seconds); 
+      $(_config.target+' .day .word').innerHTML = _config.dayWord;
+      $(_config.target+' .hour .word').innerHTML = _config.hourWord;
+      $(_config.target+' .min .word').innerHTML = _config.minWord;
+      $(_config.target+' .sec .word').innerHTML = _config.secWord; 
+
+
+      // If the count down is over, write some text 
+      if (distance < 0) {
+          clearInterval(x);
+          $(".countdown").innerHTML = "EXPIRED";
+      }
+  }, 1000);
+
+}
+
+function addZero(x) {
+  if (x < 10 && x >= 0) {
+    return "0"+x;
+  } else {
+    return x;
   }
 }
